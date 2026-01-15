@@ -111,7 +111,24 @@
 
     <div id="back-btn" onclick="closeModal()">חזרה ללוח הראשי</div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+
     <script>
+        // --- Firebase Config ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkOd9JkH6TtNP1IrgnRFYoYuxoAvxOzYI",
+            authDomain: "logistic-calender.firebaseapp.com",
+            databaseURL: "https://logistic-calender-default-rtdb.firebaseio.com",
+            projectId: "logistic-calender",
+            storageBucket: "logistic-calender.appspot.com",
+            messagingSenderId: "791878309038",
+            appId: "1:791878309038:web:fb7dc79d4703abc8b5b93f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- הנתונים שלך ---
         let data = JSON.parse(localStorage.getItem('shmuel_v19_7_final')) || { prods: [], tasks: [] };
         const mNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
         const hNames = ["טבת-שבט", "שבט-אדר", "אדר-ניסן", "ניסן-אייר", "אייר-סיון", "סיון-תמוז", "תמוז-אב", "אב-אלול", "אלול-תשרי", "תשרי-חשון", "חשון-כסלו", "כסלו-טבת"];
@@ -122,7 +139,28 @@
             "2027-03-23":"פורים","2027-04-21":"ערב פסח","2027-04-22":"פסח א'","2027-04-23":"פסח ב'","2027-04-24":"חול המועד","2027-04-25":"חול המועד","2027-04-26":"חול המועד","2027-04-27":"חול המועד","2027-04-28":"שביעי של פסח","2027-05-12":"עצמאות","2027-06-11":"שבועות","2027-10-02":"ראש השנה א'","2027-10-03":"ראש השנה ב'","2027-10-11":"יום כיפור","2027-10-16":"סוכות","2027-10-17":"סוכות ב'","2027-10-18":"חול המועד","2027-10-19":"חול המועד","2027-10-20":"חול המועד","2027-10-21":"חול המועד","2027-10-22":"חול המועד","2027-10-23":"שמחת תורה","2027-12-25":"חנוכה א'","2027-12-26":"חנוכה ב'","2027-12-27":"חנוכה ג'","2027-12-28":"חנוכה ד'","2027-12-29":"חנוכה ה'","2027-12-30":"חנוכה ו'","2027-12-31":"חנוכה ז'","2028-01-01":"חנוכה ח'"
         };
 
-        function save() { localStorage.setItem('shmuel_v19_7_final', JSON.stringify(data)); renderSidebar(); renderCalendar(); }
+        // --- הפונקציה שמעדכנת את כולם ---
+        function save() { 
+            // 1. שומר מקומית (תמיד עובד)
+            localStorage.setItem('shmuel_v19_7_final', JSON.stringify(data)); 
+            
+            // 2. שולח לענן (לסין)
+            db.ref('calendar_final').set(data);
+            
+            // 3. מרענן תצוגה
+            renderSidebar(); 
+            renderCalendar(); 
+        }
+
+        // --- קבלת נתונים מהענן בזמן אמת ---
+        db.ref('calendar_final').on('value', (snapshot) => {
+            const remoteData = snapshot.val();
+            if (remoteData) {
+                data = remoteData;
+                renderSidebar(); 
+                renderCalendar();
+            }
+        });
 
         function renderSidebar() {
             document.getElementById('product-list').innerHTML = data.prods.map(p => `
@@ -178,6 +216,7 @@
 
         function uiProd(id) {
             const p = data.prods.find(x => x.id === id);
+            if(!p) return;
             let h = `<div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ddd;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div class="editable-title">
@@ -228,7 +267,7 @@
         function saveShipInner(id, i) { 
             const s = data.prods.find(x => x.id === id).ships[i];
             s.t = document.getElementById(`t-${id}-${i}`).value;
-            s.due = document.getElementById(`due-${id}-${i}`).value; // שמירת תאריך היעד
+            s.due = document.getElementById(`due-${id}-${i}`).value;
             s.arr = document.getElementById(`arr-${id}-${i}`).value;
             s.ok = document.getElementById(`ok-${id}-${i}`).checked;
             s.okNote = document.getElementById(`ok-note-${id}-${i}`).value;
@@ -291,58 +330,6 @@
         function closeModal() { document.getElementById('overlay').style.display='none'; document.getElementById('back-btn').style.display='none'; }
 
         renderSidebar(); renderCalendar();
-  
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-
-<script>
-  // הגדרת החיבור פעם אחת בלבד
-  const firebaseConfig = {
-    apiKey: "AIzaSyDkOd9JkH6TtNP1IrgnRFYoYuxoAvxOzYI",
-    authDomain: "logistic-calender.firebaseapp.com",
-    databaseURL: "https://logistic-calender-default-rtdb.firebaseio.com",
-    projectId: "logistic-calender",
-    storageBucket: "logistic-calender.appspot.com",
-    messagingSenderId: "791878309038",
-    appId: "1:791878309038:web:fb7dc79d4703abc8b5b93f"
-  };
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
-
-  // תיקון תקלה 1: מניעת ריענון ושליחה לסין
-  const originalSave = window.save; 
-  window.save = function(e) {
-    // אם הכפתור מנסה לרענן את הדף, השורה הזו עוצרת אותו
-    if (e && e.preventDefault) e.preventDefault();
-    
-    // מפעיל את השמירה המקורית של היומן
-    if (typeof originalSave === 'function') originalSave(); 
-
-    // שולח את הנתונים ל-Firebase
-    if (typeof data !== 'undefined') {
-        db.ref('calendar_v2').set(data).then(() => {
-            console.log("סונכרן בהצלחה!");
-        });
-    }
-    return false; 
-  };
-
-  // משיכת נתונים מסין כשהאתר נפתח
-  db.ref('calendar_v2').on('value', (snapshot) => {
-    const remoteData = snapshot.val();
-    if (remoteData && typeof data !== 'undefined') {
-        data = remoteData;
-        if (typeof renderCalendar === 'function') renderCalendar();
-        if (typeof renderSidebar === 'function') renderSidebar();
-        if (typeof uiTasks === 'function') uiTasks();
-    }
-  });
-</script>
+    </script>
 </body>
 </html>
-
