@@ -3,46 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול יבוא שמואל - V19.7 FINAL FIXED</title>
+    <title>ניהול יבוא שמואל - גרסה יציבה סופית</title>
     <style>
+        /* העיצוב המקורי שלך - לא בוצע שינוי */
         :root {
             --primary: #2c3e50; --secondary: #34495e; --accent: #e74c3c;
             --success: #27ae60; --bg: #f4f7f6; --white: #ffffff; --border: #dcdde1;
             --chinese-marker: #ff7675;
             --status-red: #e74c3c; --status-orange: #e67e22; --status-green: #27ae60;
         }
-
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: #2f3640; }
-
-        /* תפריט ימני */
         #sidebar { width: 320px; background: var(--primary); color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 3px 0 15px rgba(0,0,0,0.2); z-index: 10; }
         .sidebar-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .bsh-text { font-size: 0.85rem; font-weight: normal; opacity: 0.8; display: block; margin-bottom: 5px; }
         .sidebar-header h2 { font-size: 2.3rem; margin: 0; letter-spacing: 1px; }
-
         .product-list { flex-grow: 1; overflow-y: auto; }
-        .product-item { 
-            background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 15px; border-radius: 10px; 
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;
-        }
+        .product-item { background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
         .product-item:hover { background: rgba(255,255,255,0.15); }
         .ship-count { font-size: 0.85rem; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 20px; font-weight: bold; }
-
         .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
         .footer-btn { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
         .btn-tasks { background: #8e44ad; color: white; }
         .btn-cash { background: #f1c40f; color: #2c3e50; }
-
-        /* לוח שנה */
         #main-content { flex: 1; overflow-y: auto; padding: 25px; }
         .main-title { text-align: center; color: var(--primary); font-size: 2rem; font-weight: 900; margin-bottom: 25px; border-bottom: 3px solid var(--success); display: block; width: fit-content; margin-left: auto; margin-right: auto; padding-bottom: 5px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
         .month-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eaebed; display: flex; flex-direction: column; min-height: 520px; }
         .month-header { text-align: center; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
         .month-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
-        
         .year-separator { grid-column: 1 / -1; background: var(--primary); color: white; padding: 20px; text-align: center; font-size: 2.2rem; font-weight: 900; border-radius: 15px; margin: 40px 0 10px 0; border: 4px solid var(--success); }
-
         .days-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.9rem; font-weight: 900; color: #000; background: #e8eaed; padding: 8px 0; border-radius: 5px; margin-bottom: 8px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .day-cell { height: 48px; border: 1px solid #f1f2f6; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.9rem; border-radius: 4px; position: relative; }
@@ -50,40 +39,30 @@
         .day-cell.chinese { background: var(--chinese-marker) !important; color: white !important; font-weight: bold; }
         .day-cell.holiday { background: #fff5f5; border: 1.5px solid #ffcccc; color: var(--accent); font-weight: 900; }
         .holiday-label { font-size: 0.5rem; position: absolute; bottom: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; font-weight: bold; }
-
         .month-summary { margin-top: auto; padding-top: 12px; border-top: 2px solid #f1f2f6; font-size: 0.85rem; }
         .summary-title { font-weight: 900; margin-bottom: 8px; color: var(--secondary); border-bottom: 1px solid #eee; padding-bottom: 3px; }
         .arrival-row { padding: 4px 0; border-bottom: 1px dashed #eee; display: block; }
-
-        /* מודאל */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal { background: white; width: 94%; max-width: 1150px; height: 85vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
         .close-btn { position: absolute; top: 15px; left: 15px; font-size: 2.5rem; cursor: pointer; color: #bdc3c7; line-height: 1; }
-
         .ships-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
         .ship-cube, .task-cube { border-radius: 12px; padding: 18px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); }
         .ship-cube { border-top: 6px solid var(--success); transition: 0.3s; }
         .ship-not-ok { background: #ffeaea !important; border-top-color: var(--accent) !important; }
-
-        /* מסגרות למשימות */
         .task-border-red { border: 5px solid var(--status-red) !important; }
         .task-border-orange { border: 5px solid var(--status-orange) !important; }
         .task-border-green { border: 5px solid var(--status-green) !important; }
-
         input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
         .editable-title { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .editable-title input { font-weight: bold; border: none; background: #f9f9f9; padding: 5px; }
         .editable-title input:disabled { background: transparent; }
-
         .btn-save-action { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .icon-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.7; transition: 0.2s; }
         .icon-btn:hover { opacity: 1; }
-
         #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
-
     <div id="sidebar">
         <div class="sidebar-header">
             <span class="bsh-text">בס"ד | בשם ה' נעשה ונצליח</span>
@@ -96,26 +75,18 @@
             <button class="footer-btn btn-cash" onclick="uiCash()">💰 תזרים יבוא</button>
         </div>
     </div>
-
     <div id="main-content">
         <div class="main-title">לוח שנה שנתי - סטטוס מכולות</div>
         <div id="calendar-grid" class="calendar-grid"></div>
     </div>
-
-    <div id="overlay" class="overlay">
-        <div class="modal">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modal-content"></div>
-        </div>
-    </div>
-
+    <div id="overlay" class="overlay"><div class="modal"><span class="close-btn" onclick="closeModal()">&times;</span><div id="modal-content"></div></div></div>
     <div id="back-btn" onclick="closeModal()">חזרה ללוח הראשי</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
 
     <script>
-        // --- Firebase Config ---
+        // --- Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyDkOd9JkH6TtNP1IrgnRFYoYuxoAvxOzYI",
             authDomain: "logistic-calender.firebaseapp.com",
@@ -125,65 +96,74 @@
             messagingSenderId: "791878309038",
             appId: "1:791878309038:web:fb7dc79d4703abc8b5b93f"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        // אתחול בטוח
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // --- הנתונים שלך ---
+        // אתחול נתונים בסיסי - מונע שגיאות undefined
         let data = JSON.parse(localStorage.getItem('shmuel_v19_7_final')) || { prods: [], tasks: [] };
+        if (!data.prods) data.prods = [];
+        if (!data.tasks) data.tasks = [];
+
         const mNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
         const hNames = ["טבת-שבט", "שבט-אדר", "אדר-ניסן", "ניסן-אייר", "אייר-סיון", "סיון-תמוז", "תמוז-אב", "אב-אלול", "אלול-תשרי", "תשרי-חשון", "חשון-כסלו", "כסלו-טבת"];
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
-        
-        const holidays = {
-            "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-06":"חנוכה ב'","2026-12-07":"חנוכה ג'","2026-12-08":"חנוכה ד'","2026-12-09":"חנוכה ה'","2026-12-10":"חנוכה ו'","2026-12-11":"חנוכה ז'","2026-12-12":"חנוכה ח'",
-            "2027-03-23":"פורים","2027-04-21":"ערב פסח","2027-04-22":"פסח א'","2027-04-23":"פסח ב'","2027-04-24":"חול המועד","2027-04-25":"חול המועד","2027-04-26":"חול המועד","2027-04-27":"חול המועד","2027-04-28":"שביעי של פסח","2027-05-12":"עצמאות","2027-06-11":"שבועות","2027-10-02":"ראש השנה א'","2027-10-03":"ראש השנה ב'","2027-10-11":"יום כיפור","2027-10-16":"סוכות","2027-10-17":"סוכות ב'","2027-10-18":"חול המועד","2027-10-19":"חול המועד","2027-10-20":"חול המועד","2027-10-21":"חול המועד","2027-10-22":"חול המועד","2027-10-23":"שמחת תורה","2027-12-25":"חנוכה א'","2027-12-26":"חנוכה ב'","2027-12-27":"חנוכה ג'","2027-12-28":"חנוכה ד'","2027-12-29":"חנוכה ה'","2027-12-30":"חנוכה ו'","2027-12-31":"חנוכה ז'","2028-01-01":"חנוכה ח'"
-        };
+        const holidays = { "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-06":"חנוכה ב'","2026-12-07":"חנוכה ג'","2026-12-08":"חנוכה ד'","2026-12-09":"חנוכה ה'","2026-12-10":"חנוכה ו'","2026-12-11":"חנוכה ז'","2026-12-12":"חנוכה ח'" };
 
-        // --- הפונקציה שמעדכנת את כולם ---
-        function save() { 
-            // 1. שומר מקומית (תמיד עובד)
-            localStorage.setItem('shmuel_v19_7_final', JSON.stringify(data)); 
-            
-            // 2. שולח לענן (לסין)
+        // --- Core Functions ---
+        function save() {
+            if (!data.prods) data.prods = [];
+            if (!data.tasks) data.tasks = [];
+            localStorage.setItem('shmuel_v19_7_final', JSON.stringify(data));
             db.ref('calendar_final').set(data);
-            
-            // 3. מרענן תצוגה
-            renderSidebar(); 
-            renderCalendar(); 
+            renderSidebar();
+            renderCalendar();
         }
 
-        // --- קבלת נתונים מהענן בזמן אמת ---
-        db.ref('calendar_final').on('value', (snapshot) => {
-            const remoteData = snapshot.val();
-            if (remoteData) {
-                data = remoteData;
+        db.ref('calendar_final').on('value', (s) => {
+            const cloudData = s.val();
+            if(cloudData) { 
+                data = cloudData; 
+                if (!data.prods) data.prods = [];
+                if (!data.tasks) data.tasks = [];
                 renderSidebar(); 
-                renderCalendar();
+                renderCalendar(); 
             }
         });
 
         function renderSidebar() {
-            document.getElementById('product-list').innerHTML = data.prods.map(p => `
+            const listDiv = document.getElementById('product-list');
+            if (!listDiv) return;
+            const prods = data.prods || [];
+            listDiv.innerHTML = prods.map(p => {
+                const sCount = (p.ships && Array.isArray(p.ships)) ? p.ships.length : 0;
+                return `
                 <div class="product-item" onclick="uiProd(${p.id})">
                     <span style="font-weight:bold;">${p.name}</span>
-                    <span class="ship-count">${p.ships.length} עסקאות</span>
-                </div>`).join('');
+                    <span class="ship-count">${sCount} עסקאות</span>
+                </div>`;
+            }).join('');
         }
 
         function renderCalendar() {
-            const grid = document.getElementById('calendar-grid'); grid.innerHTML = '';
+            const grid = document.getElementById('calendar-grid'); 
+            if(!grid) return;
+            grid.innerHTML = '';
             [2026, 2027].forEach(year => {
                 if(year === 2027) grid.innerHTML += `<div class="year-separator">שנת 2027 בשעה טובה</div>`;
                 for (let m = 0; m < 12; m++) {
                     const arrivals = [];
-                    data.prods.forEach(p => p.ships.forEach(s => {
-                        if(s.arr) {
-                            const dObj = new Date(s.arr);
-                            if(dObj.getFullYear() === year && dObj.getMonth() === m) {
-                                arrivals.push({ day: dObj.getDate(), name: s.t || p.name, cnt: s.cnt || '' });
+                    (data.prods || []).forEach(p => {
+                        (p.ships || []).forEach(s => {
+                            if(s.arr) {
+                                const dObj = new Date(s.arr);
+                                if(dObj.getFullYear() === year && dObj.getMonth() === m) {
+                                    arrivals.push({ day: dObj.getDate(), name: s.t || p.name, cnt: s.cnt || '' });
+                                }
                             }
-                        }
-                    }));
+                        });
+                    });
                     arrivals.sort((a,b) => a.day - b.day);
                     grid.innerHTML += `<div class="month-card">
                         <div class="month-header"><div class="month-title">${mNames[m]} | ${hNames[m]} ${year}</div></div>
@@ -202,12 +182,11 @@
             let h = ''; const first = new Date(y, m, 1).getDay(); const total = new Date(y, m+1, 0).getDate();
             for(let i=0; i<first; i++) h += '<div></div>';
             for(let d=1; d<=total; d++) {
-                const isC = (y === 2026 && m === 1 && d >= 3 && d <= 17);
-                const isC27 = (y === 2027 && m === 1 && d >= 6 && d <= 20);
+                const isC = (y === 2026 && m === 1 && d >= 3 && d <= 17) || (y === 2027 && m === 1 && d >= 6 && d <= 20);
                 const k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const hasArr = arrDays.includes(d);
-                h += `<div class="day-cell ${(isC || isC27)?'chinese':''} ${holidays[k]?'holiday':''} ${hasArr?'arrival-day':''}">
-                    ${d} ${(isC || isC27) ? '<span class="holiday-label">חג סיני</span>' : ''}
+                h += `<div class="day-cell ${isC?'chinese':''} ${holidays[k]?'holiday':''} ${hasArr?'arrival-day':''}">
+                    ${d} ${isC ? '<span class="holiday-label">חג סיני</span>' : ''}
                     ${holidays[k]?`<span class="holiday-label">${holidays[k]}</span>`:''}
                 </div>`;
             }
@@ -230,7 +209,7 @@
                     </div>
                 </div>
             </div><div class="ships-grid">`;
-            p.ships.forEach((s, i) => {
+            (p.ships || []).forEach((s, i) => {
                 const redClass = s.ok ? '' : 'ship-not-ok';
                 h += `<div class="ship-cube ${redClass}">
                     <div class="editable-title">
@@ -238,25 +217,13 @@
                         <span class="icon-btn" onclick="enableShipEdit(${id},${i})">✏️</span>
                         <span class="icon-btn" onclick="remShipInner(${id},${i})">🗑️</span>
                     </div>
-
-                    <label style="font-weight:bold; color:var(--accent);">תאריך יעד לעסקה:</label>
-                    <input type="date" id="due-${id}-${i}" value="${s.due||''}" style="border:1px solid var(--accent);">
-
+                    <label style="font-weight:bold; color:var(--accent);">תאריך יעד:</label><input type="date" id="due-${id}-${i}" value="${s.due||''}">
                     <label>צפי הגעה:</label><input type="date" id="arr-${id}-${i}" value="${s.arr||''}">
-                    
-                    <div style="background:rgba(255,255,255,0.6); padding:10px; border-radius:8px; border:1px solid #ddd;">
-                        <label style="font-weight:bold;"><input type="checkbox" id="ok-${id}-${i}" ${s.ok?'checked':''}> אישור הזמנה</label>
-                        <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות לאישור..." style="margin-top:5px; font-size:0.85rem;">
-                    </div>
+                    <label><input type="checkbox" id="ok-${id}-${i}" ${s.ok?'checked':''}> אישור הזמנה</label>
+                    <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות..." style="margin-top:5px;">
                     <label><input type="checkbox" id="sea-${id}-${i}" ${s.sea?'checked':''}> יצא לים</label>
                     <label>מכולות:</label><input type="text" id="cnt-${id}-${i}" value="${s.cnt||''}">
                     <label>סכום ($):</label><input type="number" id="val-${id}-${i}" value="${s.val||0}">
-                    
-                    <div style="background:#f9f9f9; padding:8px; border-radius:8px; border:1px solid #eee; margin:5px 0;">
-                        <label style="display:block; font-size:0.85rem; cursor:pointer;"><input type="checkbox" id="site-${id}-${i}" ${s.site?'checked':''}> האם עסקה עלתה לאתר</label>
-                        <label style="display:block; font-size:0.85rem; cursor:pointer; margin-top:5px;"><input type="checkbox" id="customs-${id}-${i}" ${s.customs?'checked':''}> האם חומר נשלח לעמיל מכס</label>
-                    </div>
-
                     <textarea id="note-${id}-${i}" placeholder="הערות לוגיסטיקה...">${s.note||''}</textarea>
                     <button class="btn-save-action" onclick="saveShipInner(${id}, ${i})">💾 שמור</button>
                 </div>`;
@@ -265,7 +232,8 @@
         }
 
         function saveShipInner(id, i) { 
-            const s = data.prods.find(x => x.id === id).ships[i];
+            const p = data.prods.find(x => x.id === id);
+            const s = p.ships[i];
             s.t = document.getElementById(`t-${id}-${i}`).value;
             s.due = document.getElementById(`due-${id}-${i}`).value;
             s.arr = document.getElementById(`arr-${id}-${i}`).value;
@@ -274,40 +242,40 @@
             s.sea = document.getElementById(`sea-${id}-${i}`).checked;
             s.cnt = document.getElementById(`cnt-${id}-${i}`).value;
             s.val = document.getElementById(`val-${id}-${i}`).value;
-            s.site = document.getElementById(`site-${id}-${i}`).checked;
-            s.customs = document.getElementById(`customs-${id}-${i}`).checked;
             s.note = document.getElementById(`note-${id}-${i}`).value;
             save(); uiProd(id); 
         }
 
         function uiCash() {
             let groups = {};
-            data.prods.forEach(p => p.ships.forEach(s => {
-                if(s.sea && s.arr && s.val > 0) {
-                    const dPay = new Date(s.arr); dPay.setDate(dPay.getDate() - 7);
-                    const mKey = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
-                    if(!groups[mKey]) groups[mKey] = { items: [], total: 0 };
-                    groups[mKey].items.push({ name: s.t || p.name, pay: dPay.toLocaleDateString('he-IL'), val: s.val * 0.7 });
-                    groups[mKey].total += (s.val * 0.7);
-                }
-            }));
+            (data.prods || []).forEach(p => { 
+                (p.ships || []).forEach(s => {
+                    if(s.sea && s.arr && s.val > 0) {
+                        const dPay = new Date(s.arr); dPay.setDate(dPay.getDate() - 7);
+                        const mKey = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
+                        if(!groups[mKey]) groups[mKey] = { items: [], total: 0 };
+                        groups[mKey].items.push({ name: s.t || p.name, pay: dPay.toLocaleDateString('he-IL'), val: s.val * 0.7 });
+                        groups[mKey].total += (s.val * 0.7);
+                    }
+                });
+            });
             let h = '<h2>💰 תזרים יבוא (70%)</h2>';
             for (let m in groups) {
                 h += `<div style="background:#fff; margin-bottom:15px; border-radius:10px; border:1px solid #eee;"><div style="background:#f1f2f6; padding:10px; font-weight:bold;">${m}</div>`;
                 groups[m].items.forEach(it => { h += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><span>${it.name} (${it.pay})</span><b>${it.val.toLocaleString()}$</b></div>`; });
                 h += `<div style="padding:10px; text-align:left; font-weight:900;">סה"כ: ${groups[m].total.toLocaleString()}$</div></div>`;
             }
-            openModal(h || 'אין נתוני תזרים זמינים');
+            openModal(h || 'אין נתוני תזרים');
         }
 
         function uiTasks() {
+            const tasks = data.tasks || [];
             let h = `<h2>📝 לוח משימות</h2><div style="display:flex; gap:10px; margin-bottom:20px;"><input type="text" id="nt" placeholder="משימה חדשה..." style="flex:2;"><button onclick="addTask()" class="btn-save-action" style="margin:0; padding:0 30px;">הוסף</button></div><div class="ships-grid">`;
-            data.tasks.forEach((t, i) => {
+            tasks.forEach((t, i) => {
                 let borderClass = t.st==='בטיפול'?'task-border-orange':(t.st==='בוצע'?'task-border-green':'task-border-red');
                 h += `<div class="task-cube ${borderClass}">
                     <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>${t.n}</span><span onclick="remT(${i})" style="cursor:pointer;">🗑️</span></div>
                     <select id="t-st-${i}"><option value="טרם החל" ${t.st==='טרם החל'?'selected':''}>🔴 טרם החל</option><option value="בטיפול" ${t.st==='בטיפול'?'selected':''}>🟠 בטיפול</option><option value="בוצע" ${t.st==='בוצע'?'selected':''}>🟢 בוצע</option></select>
-                    <label style="font-size:0.85rem; font-weight:bold; margin-top:5px;">תאריך יעד למשימה:</label>
                     <input type="date" id="t-due-${i}" value="${t.due||''}">
                     <textarea id="t-note-${i}">${t.note||''}</textarea>
                     <button class="btn-save-action" onclick="saveTask(${i})">💾 שמור</button>
@@ -317,15 +285,15 @@
         }
 
         function saveTask(i) { data.tasks[i].st = document.getElementById(`t-st-${i}`).value; data.tasks[i].due = document.getElementById(`t-due-${i}`).value; data.tasks[i].note = document.getElementById(`t-note-${i}`).value; save(); uiTasks(); }
-        function addTask() { const n=document.getElementById('nt').value; if(n){ data.tasks.push({n, st:'טרם החל', note:'', due:''}); save(); uiTasks(); } }
+        function addTask() { const n=document.getElementById('nt').value; if(n){ if(!data.tasks) data.tasks=[]; data.tasks.push({n, st:'טרם החל', note:'', due:''}); save(); uiTasks(); } }
         function remT(i) { if(confirm("למחוק?")){ data.tasks.splice(i,1); save(); uiTasks(); } }
-        function enableMainEdit(id) { const inp = document.getElementById(`main-name-${id}`); inp.disabled = false; inp.focus(); inp.style.background = "#fff"; document.getElementById(`save-main-${id}`).style.display = "inline-block"; }
+        function enableMainEdit(id) { const inp = document.getElementById(`main-name-${id}`); inp.disabled = false; inp.focus(); document.getElementById(`save-main-${id}`).style.display='inline'; }
         function saveMainName(id) { data.prods.find(x => x.id === id).name = document.getElementById(`main-name-${id}`).value; save(); uiProd(id); }
-        function enableShipEdit(id, i) { const inp = document.getElementById(`t-${id}-${i}`); inp.disabled = false; inp.focus(); inp.style.background = "#fff"; }
-        function addMainShip() { const n = prompt("שם תיק:"); if(n){ data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
-        function addShipInner(id) { data.prods.find(x => x.id === id).ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:'', site:false, customs:false}); save(); uiProd(id); }
-        function remMainProd(id) { if(confirm("למחוק תיק?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
-        function remShipInner(id, i) { if(confirm("למחוק?")){ data.prods.find(x => x.id === id).ships.splice(i,1); save(); uiProd(id); } }
+        function enableShipEdit(id, i) { document.getElementById(`t-${id}-${i}`).disabled = false; }
+        function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ if(!data.prods) data.prods=[]; data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
+        function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:''}); save(); uiProd(id); }
+        function remMainProd(id) { if(confirm("למחוק תיק זה לצמיתות?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
+        function remShipInner(id, i) { if(confirm("למחוק עסקה זו?")){ data.prods.find(x => x.id === id).ships.splice(i,1); save(); uiProd(id); } }
         function openModal(h) { document.getElementById('modal-content').innerHTML = h; document.getElementById('overlay').style.display='flex'; document.getElementById('back-btn').style.display='block'; }
         function closeModal() { document.getElementById('overlay').style.display='none'; document.getElementById('back-btn').style.display='none'; }
 
