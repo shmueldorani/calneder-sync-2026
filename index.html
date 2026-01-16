@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול יבוא שמואל - גרסה יציבה סופית</title>
+    <title>ניהול יבוא שמואל - גרסה 19.8</title>
     <style>
-        /* העיצוב המקורי שלך - לא בוצע שינוי */
         :root {
             --primary: #2c3e50; --secondary: #34495e; --accent: #e74c3c;
             --success: #27ae60; --bg: #f4f7f6; --white: #ffffff; --border: #dcdde1;
@@ -14,13 +13,29 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: #2f3640; }
         #sidebar { width: 320px; background: var(--primary); color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 3px 0 15px rgba(0,0,0,0.2); z-index: 10; }
-        .sidebar-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .sidebar-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         .bsh-text { font-size: 0.85rem; font-weight: normal; opacity: 0.8; display: block; margin-bottom: 5px; }
         .sidebar-header h2 { font-size: 2.3rem; margin: 0; letter-spacing: 1px; }
+        
+        /* עיצוב שורת החיפוש */
+        .search-container { position: relative; margin-bottom: 15px; }
+        #sidebar-search { width: 100%; padding: 10px 35px 10px 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-size: 0.95rem; }
+        #sidebar-search::placeholder { color: rgba(255,255,255,0.5); }
+        .search-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+        .clear-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; display: none; font-weight: bold; font-size: 1.2rem; opacity: 0.7; }
+
         .product-list { flex-grow: 1; overflow-y: auto; }
-        .product-item { background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .product-item { background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
         .product-item:hover { background: rgba(255,255,255,0.15); }
-        .ship-count { font-size: 0.85rem; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+        .prod-info { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        .prod-name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ship-count { font-size: 0.75rem; opacity: 0.7; }
+        
+        /* עיצוב חיצי סידור */
+        .order-controls { display: flex; flex-direction: column; gap: 5px; margin-right: 10px; }
+        .order-btn { background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem; transition: 0.2s; }
+        .order-btn:hover { background: var(--success); }
+
         .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
         .footer-btn { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
         .btn-tasks { background: #8e44ad; color: white; }
@@ -49,9 +64,6 @@
         .ship-cube, .task-cube { border-radius: 12px; padding: 18px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); }
         .ship-cube { border-top: 6px solid var(--success); transition: 0.3s; }
         .ship-not-ok { background: #ffeaea !important; border-top-color: var(--accent) !important; }
-        .task-border-red { border: 5px solid var(--status-red) !important; }
-        .task-border-orange { border: 5px solid var(--status-orange) !important; }
-        .task-border-green { border: 5px solid var(--status-green) !important; }
         input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
         .editable-title { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .editable-title input { font-weight: bold; border: none; background: #f9f9f9; padding: 5px; }
@@ -61,7 +73,6 @@
         .icon-btn:hover { opacity: 1; }
         #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* עיצוב הודעת "נשמר בהצלחה" */
         .toast-msg {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: #27ae60; color: white; padding: 12px 25px; border-radius: 50px;
@@ -75,11 +86,10 @@
             100% { opacity: 0; bottom: 10px; }
         }
 
-        /* קוד מיוחד להתאמה לטלפון בלבד */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow-y: auto; }
-            #sidebar { width: 100% !important; height: auto !important; position: relative; padding: 10px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; justify-content: center; }
-            .sidebar-header, .bsh-text { display: none; }
+            #sidebar { width: 100% !important; height: auto !important; position: relative; padding: 10px; }
+            .sidebar-header, .bsh-text, .search-container { display: none; }
             #sidebar button { width: 45%; margin: 2px; padding: 10px; font-size: 14px; }
             #main-content { width: 100%; padding: 10px; overflow: visible; }
             .calendar-grid { grid-template-columns: 1fr; }
@@ -92,20 +102,30 @@
             <span class="bsh-text">בס"ד | בשם ה' נעשה ונצליח</span>
             <h2>ניהול יבוא</h2>
         </div>
-        <button onclick="addMainShip()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:20px; font-weight:bold; font-size:1.1rem;">+ הוספת תיק עסקה</button>
+        
+        <button onclick="addMainShip()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:15px; font-weight:bold; font-size:1.1rem;">+ הוספת תיק עסקה</button>
+        
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="sidebar-search" placeholder="חפש תיק..." oninput="filterProds()">
+            <span id="clear-search" class="clear-search" onclick="resetSearch()">&times;</span>
+        </div>
+
         <div id="product-list" class="product-list"></div>
+        
         <div class="sidebar-footer">
             <button class="footer-btn btn-tasks" onclick="uiTasks()">📝 לוח משימות</button>
             <button class="footer-btn btn-cash" onclick="uiCash()">💰 תזרים יבוא</button>
         </div>
     </div>
+    
     <div id="main-content">
         <div class="main-title">לוח שנה שנתי - סטטוס מכולות</div>
         <div id="calendar-grid" class="calendar-grid"></div>
     </div>
+    
     <div id="overlay" class="overlay"><div class="modal"><span class="close-btn" onclick="closeModal()">&times;</span><div id="modal-content"></div></div></div>
     <div id="back-btn" onclick="closeModal()">חזרה ללוח הראשי</div>
-    
     <div id="toast-container" class="toast-msg">✅ נשמר בהצלחה!</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -125,10 +145,7 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        let data = JSON.parse(localStorage.getItem('shmuel_v19_7_final')) || { prods: [], tasks: [] };
-        if (!data.prods) data.prods = [];
-        if (!data.tasks) data.tasks = [];
-
+        let data = JSON.parse(localStorage.getItem('shmuel_v19_8')) || { prods: [], tasks: [] };
         const mNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
         const hNames = ["טבת-שבט", "שבט-אדר", "אדר-ניסן", "ניסן-אייר", "אייר-סיון", "סיון-תמוז", "תמוז-אב", "אב-אלול", "אלול-תשרי", "תשרי-חשון", "חשון-כסלו", "כסלו-טבת"];
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
@@ -141,9 +158,7 @@
         }
 
         function save() {
-            if (!data.prods) data.prods = [];
-            if (!data.tasks) data.tasks = [];
-            localStorage.setItem('shmuel_v19_7_final', JSON.stringify(data));
+            localStorage.setItem('shmuel_v19_8', JSON.stringify(data));
             db.ref('calendar_final').set(data);
             renderSidebar();
             renderCalendar();
@@ -155,20 +170,55 @@
             if(cloudData) { 
                 data = cloudData; 
                 if (!data.prods) data.prods = [];
-                if (!data.tasks) data.tasks = [];
                 renderSidebar(); 
                 renderCalendar(); 
             }
         });
 
-        function renderSidebar() {
+        // פונקציית חיפוש
+        function filterProds() {
+            const val = document.getElementById('sidebar-search').value.toLowerCase();
+            document.getElementById('clear-search').style.display = val ? 'block' : 'none';
+            renderSidebar(val);
+        }
+
+        function resetSearch() {
+            document.getElementById('sidebar-search').value = '';
+            filterProds();
+        }
+
+        // פונקציית שינוי סדר
+        function moveProd(idx, dir) {
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= data.prods.length) return;
+            const temp = data.prods[idx];
+            data.prods[idx] = data.prods[newIdx];
+            data.prods[newIdx] = temp;
+            save();
+        }
+
+        function renderSidebar(filter = '') {
             const listDiv = document.getElementById('product-list');
             if (!listDiv) return;
-            const prods = data.prods || [];
-            listDiv.innerHTML = prods.map(p => {
-                const sCount = (p.ships && Array.isArray(p.ships)) ? p.ships.length : 0;
-                return `<div class="product-item" onclick="uiProd(${p.id})"><span style="font-weight:bold;">${p.name}</span><span class="ship-count">${sCount} עסקאות</span></div>`;
-            }).join('');
+            
+            listDiv.innerHTML = data.prods
+                .map((p, i) => ({p, i}))
+                .filter(item => item.p.name.toLowerCase().includes(filter))
+                .map(item => {
+                    const {p, i} = item;
+                    const sCount = (p.ships && Array.isArray(p.ships)) ? p.ships.length : 0;
+                    return `
+                    <div class="product-item">
+                        <div class="order-controls">
+                            <button class="order-btn" onclick="event.stopPropagation(); moveProd(${i}, -1)">▲</button>
+                            <button class="order-btn" onclick="event.stopPropagation(); moveProd(${i}, 1)">▼</button>
+                        </div>
+                        <div class="prod-info" onclick="uiProd(${p.id})">
+                            <span class="prod-name">${p.name}</span>
+                            <span class="ship-count">${sCount} עסקאות</span>
+                        </div>
+                    </div>`;
+                }).join('');
         }
 
         function renderCalendar() {
@@ -285,7 +335,6 @@
                         const dPay = new Date(s.arr); dPay.setDate(dPay.getDate() - 7);
                         const mKey = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
                         if(!groups[mKey]) groups[mKey] = { items: [], total: 0 };
-                        // כאן הוספתי את תאריך ההגעה בסוגריים
                         const formattedArr = new Date(s.arr).toLocaleDateString('he-IL');
                         groups[mKey].items.push({ name: s.t || p.name, pay: dPay.toLocaleDateString('he-IL'), arr: formattedArr, val: s.val * 0.7 });
                         groups[mKey].total += (s.val * 0.7);
