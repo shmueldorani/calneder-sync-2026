@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול יבוא שמואל - גרסה יציבה + חיפוש וחגים</title>
+    <title>ניהול יבוא שמואל - גרסה סופית מתוקנת</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #34495e; --accent: #e74c3c;
@@ -13,32 +13,26 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: #2f3640; }
         #sidebar { width: 320px; background: var(--primary); color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 3px 0 15px rgba(0,0,0,0.2); z-index: 10; }
-        .sidebar-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .sidebar-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .bsh-text { font-size: 0.85rem; font-weight: normal; opacity: 0.8; display: block; margin-bottom: 5px; }
         .sidebar-header h2 { font-size: 2.3rem; margin: 0; letter-spacing: 1px; }
-        
-        /* שורת חיפוש בעיצוב שתואם לסיידבר */
+
         #searchBox { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; outline: none; box-sizing: border-box; }
         #searchBox::placeholder { color: rgba(255,255,255,0.5); }
-
-        .product-list { flex-grow: 1; overflow-y: auto; }
-        .product-item { background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-        .product-item:hover { background: rgba(255,255,255,0.15); }
-        
         .order-controls { display: flex; flex-direction: column; gap: 2px; margin-left: 10px; }
-        .arrow-btn { background: none; border: none; color: white; cursor: pointer; font-size: 0.7rem; opacity: 0.4; padding: 0; }
+        .arrow-btn { background: none; border: none; color: white; cursor: pointer; font-size: 0.7rem; opacity: 0.4; padding: 0; line-height: 1; }
         .arrow-btn:hover { opacity: 1; color: var(--success); }
 
-        .ship-count { font-size: 0.85rem; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-right: auto; }
-        
+        .product-list { flex-grow: 1; overflow-y: auto; }
+        .product-item { background: rgba(255,255,255,0.07); margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .product-item:hover { background: rgba(255,255,255,0.15); }
+        .ship-count { font-size: 0.85rem; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 20px; font-weight: bold; }
         .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
         .footer-btn { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
         .btn-tasks { background: #8e44ad; color: white; }
         .btn-cash { background: #f1c40f; color: #2c3e50; }
-        
         #main-content { flex: 1; overflow-y: auto; padding: 25px; }
         .main-title { text-align: center; color: var(--primary); font-size: 2rem; font-weight: 900; margin-bottom: 25px; border-bottom: 3px solid var(--success); display: block; width: fit-content; margin-left: auto; margin-right: auto; padding-bottom: 5px; }
-        
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
         .month-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eaebed; display: flex; flex-direction: column; min-height: 520px; }
         .month-header { text-align: center; margin-bottom: 10px; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
@@ -51,34 +45,41 @@
         .day-cell.chinese { background: var(--chinese-marker) !important; color: white !important; font-weight: bold; }
         .day-cell.holiday { background: #fff5f5; border: 1.5px solid #ffcccc; color: var(--accent); font-weight: 900; }
         .holiday-label { font-size: 0.5rem; position: absolute; bottom: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; font-weight: bold; }
-        
         .month-summary { margin-top: auto; padding-top: 12px; border-top: 2px solid #f1f2f6; font-size: 0.85rem; }
         .summary-title { font-weight: 900; margin-bottom: 8px; color: var(--secondary); border-bottom: 1px solid #eee; padding-bottom: 3px; }
         .arrival-row { padding: 4px 0; border-bottom: 1px dashed #eee; display: block; }
-
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal { background: white; width: 94%; max-width: 1150px; height: 85vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
         .close-btn { position: absolute; top: 15px; left: 15px; font-size: 2.5rem; cursor: pointer; color: #bdc3c7; line-height: 1; }
         .ships-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
         .ship-cube, .task-cube { border-radius: 12px; padding: 18px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); }
-        .ship-cube { border-top: 6px solid var(--success); }
+        .ship-cube { border-top: 6px solid var(--success); transition: 0.3s; }
         .ship-not-ok { background: #ffeaea !important; border-top-color: var(--accent) !important; }
-        
         .task-border-red { border: 5px solid var(--status-red) !important; }
         .task-border-orange { border: 5px solid var(--status-orange) !important; }
         .task-border-green { border: 5px solid var(--status-green) !important; }
-
         input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
-        .btn-save-action { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        
-        .toast-msg { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #27ae60; color: white; padding: 12px 25px; border-radius: 50px; font-weight: bold; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; animation: fadeInOut 3s forwards; }
+        .editable-title { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .editable-title input { font-weight: bold; border: none; background: #f9f9f9; padding: 5px; }
+        .editable-title input:disabled { background: transparent; }
+        .btn-save-action { background: var(--success); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .icon-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.7; transition: 0.2s; }
+        .icon-btn:hover { opacity: 1; }
+        #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .toast-msg {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #27ae60; color: white; padding: 12px 25px; border-radius: 50px;
+            font-weight: bold; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none; animation: fadeInOut 3s forwards;
+        }
         @keyframes fadeInOut { 0% { opacity: 0; bottom: 10px; } 15% { opacity: 1; bottom: 20px; } 85% { opacity: 1; bottom: 20px; } 100% { opacity: 0; bottom: 10px; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow-y: auto; }
-            #sidebar { width: 100% !important; height: auto !important; padding: 10px; }
+            #sidebar { width: 100% !important; height: auto !important; position: relative; padding: 10px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; justify-content: center; }
             .sidebar-header, .bsh-text, #searchBox { display: none; }
-            #main-content { padding: 10px; }
+            #sidebar button { width: 45%; margin: 2px; padding: 10px; font-size: 14px; }
+            #main-content { width: 100%; padding: 10px; overflow: visible; }
             .calendar-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -89,24 +90,20 @@
             <span class="bsh-text">בס"ד | בשם ה' נעשה ונצליח</span>
             <h2>ניהול יבוא</h2>
         </div>
-        <button onclick="addMainShip()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:15px; font-weight:bold;">+ הוספת תיק עסקה</button>
-        
+        <button onclick="addMainShip()" style="width:100%; padding:15px; background:var(--success); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:15px; font-weight:bold; font-size:1.1rem;">+ הוספת תיק עסקה</button>
         <input type="text" id="searchBox" placeholder="🔍 חפש תיק..." oninput="renderSidebar()">
-
         <div id="product-list" class="product-list"></div>
-        
         <div class="sidebar-footer">
             <button class="footer-btn btn-tasks" onclick="uiTasks()">📝 לוח משימות</button>
             <button class="footer-btn btn-cash" onclick="uiCash()">💰 תזרים יבוא</button>
         </div>
     </div>
-    
     <div id="main-content">
         <div class="main-title">לוח שנה שנתי - סטטוס מכולות</div>
         <div id="calendar-grid" class="calendar-grid"></div>
     </div>
-    
     <div id="overlay" class="overlay"><div class="modal"><span class="close-btn" onclick="closeModal()">&times;</span><div id="modal-content"></div></div></div>
+    <div id="back-btn" onclick="closeModal()">חזרה ללוח הראשי</div>
     <div id="toast-container" class="toast-msg">✅ נשמר בהצלחה!</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -133,9 +130,8 @@
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
         
         const holidays = { 
-            "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-08":"פסח ב'","2026-05-23":"שבועות","2026-09-12":"ראש השנה","2026-09-21":"יום כיפור","2026-09-26":"סוכות",
-            "2027-03-23":"פורים","2027-04-21":"ערב פסח","2027-04-22":"פסח א'","2027-04-23":"חול המועד","2027-04-24":"חול המועד","2027-04-25":"חול המועד","2027-04-26":"חול המועד","2027-04-27":"חול המועד","2027-04-28":"פסח ב'",
-            "2027-05-12":"עצמאות","2027-06-11":"שבועות","2027-10-02":"ראש השנה א'","2027-10-03":"ראש השנה ב'","2027-10-11":"יום כיפור","2027-10-16":"סוכות א'","2027-10-17":"סוכות ב'","2027-10-23":"שמחת תורה"
+            "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-12":"חנוכה ח'",
+            "2027-03-23":"פורים","2027-04-21":"ערב פסח","2027-04-22":"פסח א'","2027-04-28":"פסח ב'","2027-05-12":"עצמאות","2027-06-11":"שבועות","2027-10-02":"ראש השנה א'","2027-10-11":"יום כיפור","2027-10-16":"סוכות א'","2027-10-23":"שמחת תורה"
         };
 
         function showSaveToast() {
@@ -145,6 +141,8 @@
         }
 
         function save() {
+            if (!data.prods) data.prods = [];
+            if (!data.tasks) data.tasks = [];
             db.ref('calendar_final').set(data);
             showSaveToast();
         }
@@ -174,7 +172,8 @@
             const listDiv = document.getElementById('product-list');
             const searchTerm = document.getElementById('searchBox') ? document.getElementById('searchBox').value.toLowerCase() : "";
             if (!listDiv) return;
-            listDiv.innerHTML = (data.prods || []).map((p, i) => {
+            const prods = data.prods || [];
+            listDiv.innerHTML = prods.map((p, i) => {
                 if (searchTerm && !p.name.toLowerCase().includes(searchTerm)) return '';
                 const sCount = (p.ships && Array.isArray(p.ships)) ? p.ships.length : 0;
                 return `
@@ -183,7 +182,7 @@
                         <button class="arrow-btn" onclick="moveProd(${i}, -1, event)">▲</button>
                         <button class="arrow-btn" onclick="moveProd(${i}, 1, event)">▼</button>
                     </div>
-                    <div style="flex-grow:1; display:flex; align-items:center;" onclick="uiProd(${p.id})">
+                    <div style="flex-grow:1; display:flex; justify-content:space-between; align-items:center;" onclick="uiProd(${p.id})">
                         <span style="font-weight:bold;">${p.name}</span>
                         <span class="ship-count">${sCount} עסקאות</span>
                     </div>
@@ -241,28 +240,38 @@
         function uiProd(id) {
             const p = data.prods.find(x => x.id === id);
             if(!p) return;
-            let h = `<h3>תיק עסקה: ${p.name}</h3>
-            <div style="margin-bottom:15px; display:flex; gap:10px;">
-                <button onclick="addShipInner(${id})" class="btn-save-action" style="background:#3498db;">+ הוסף עסקה</button>
-                <button onclick="remMainProd(${id})" class="btn-save-action" style="background:var(--accent);">🗑️ מחק תיק</button>
-            </div>
-            <div class="ships-grid">`;
+            let h = `<div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ddd;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="editable-title">
+                        <input type="text" id="main-name-${id}" value="${p.name}" disabled>
+                        <span class="icon-btn" onclick="enableMainEdit(${id})">✏️</span>
+                        <button id="save-main-${id}" onclick="saveMainName(${id})" style="display:none; background:var(--success); color:white; border:none; padding:5px; border-radius:4px;">שמור</button>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="addShipInner(${id})" class="btn-save-action" style="margin:0; background:#3498db;">+ הוסף עסקה</button>
+                        <button onclick="remMainProd(${id})" class="btn-save-action" style="margin:0; background:var(--accent);">🗑️ מחק תיק</button>
+                    </div>
+                </div>
+            </div><div class="ships-grid">`;
             (p.ships || []).forEach((s, i) => {
                 const redClass = s.ok ? '' : 'ship-not-ok';
                 h += `<div class="ship-cube ${redClass}">
-                    <label>שם העסקה:</label><input type="text" id="t-${id}-${i}" value="${s.t||''}">
-                    <label>תאריך יעד:</label><input type="date" id="due-${id}-${i}" value="${s.due||''}">
+                    <div class="editable-title">
+                        <input type="text" id="t-${id}-${i}" value="${s.t||''}" placeholder="שם העסקה" disabled>
+                        <span class="icon-btn" onclick="enableShipEdit(${id},${i})">✏️</span>
+                        <span class="icon-btn" onclick="remShipInner(${id},${i})">🗑️</span>
+                    </div>
+                    <label style="font-weight:bold; color:var(--accent);">תאריך יעד:</label><input type="date" id="due-${id}-${i}" value="${s.due||''}">
                     <label>צפי הגעה:</label><input type="date" id="arr-${id}-${i}" value="${s.arr||''}">
                     <label><input type="checkbox" id="ok-${id}-${i}" ${s.ok?'checked':''}> אישור הזמנה</label>
-                    <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות אישור...">
+                    <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות..." style="margin-top:5px;">
                     <label><input type="checkbox" id="sea-${id}-${i}" ${s.sea?'checked':''}> יצא לים</label>
                     <label>מכולות:</label><input type="text" id="cnt-${id}-${i}" value="${s.cnt||''}">
                     <label>סכום ($):</label><input type="number" id="val-${id}-${i}" value="${s.val||0}">
                     <textarea id="note-${id}-${i}" placeholder="הערות לוגיסטיקה...">${s.note||''}</textarea>
-                    <label><input type="checkbox" id="siteUp-${id}-${i}" ${s.siteUp?'checked':''}> חומר עלה לאתר?</label>
-                    <label><input type="checkbox" id="brokerSent-${id}-${i}" ${s.brokerSent?'checked':''}> נשלח לעמיל מכס?</label>
+                    <label style="margin-top:5px; border-top: 1px solid #eee; padding-top:10px;"><input type="checkbox" id="siteUp-${id}-${i}" ${s.siteUp?'checked':''}> האם חומר עלה לאתר?</label>
+                    <label><input type="checkbox" id="brokerSent-${id}-${i}" ${s.brokerSent?'checked':''}> האם נשלח חומר לעמיל מכס?</label>
                     <button class="btn-save-action" onclick="saveShipInner(${id}, ${i})">💾 שמור</button>
-                    <button onclick="remShipInner(${id},${i})" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.8rem; margin-top:5px;">🗑️ מחק עסקה</button>
                 </div>`;
             });
             openModal(h + '</div>');
@@ -282,36 +291,8 @@
             s.note = document.getElementById(`note-${id}-${i}`).value;
             s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
             s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
-            save(); uiProd(id);
+            save(); uiProd(id); 
         }
-
-        function uiTasks() {
-            let h = `<h2>📝 לוח משימות</h2><div style="margin-bottom:20px; display:flex; gap:10px;"><input type="text" id="nt" placeholder="משימה חדשה..." style="flex:1;"><button onclick="addTask()" class="btn-save-action" style="margin:0;">הוסף</button></div><div class="ships-grid">`;
-            (data.tasks || []).forEach((t, i) => {
-                let borderClass = t.st==='בטיפול'?'task-border-orange':(t.st==='בוצע'?'task-border-green':'task-border-red');
-                h += `<div class="task-cube ${borderClass}">
-                    <b>${t.n}</b>
-                    <select id="t-st-${i}" onchange="saveTask(${i})">
-                        <option value="טרם החל" ${t.st==='טרם החל'?'selected':''}>🔴 טרם החל</option>
-                        <option value="בטיפול" ${t.st==='בטיפול'?'selected':''}>🟠 בטיפול</option>
-                        <option value="בוצע" ${t.st==='בוצע'?'selected':''}>🟢 בוצע</option>
-                    </select>
-                    <input type="date" id="t-due-${i}" value="${t.due||''}" onchange="saveTask(${i})">
-                    <textarea id="t-note-${i}" onchange="saveTask(${i})">${t.note||''}</textarea>
-                    <button onclick="remT(${i})" style="margin-top:5px; background:none; border:none; color:var(--accent); cursor:pointer;">🗑️ מחק</button>
-                </div>`;
-            });
-            openModal(h + '</div>');
-        }
-
-        function saveTask(i) { 
-            data.tasks[i].st = document.getElementById(`t-st-${i}`).value; 
-            data.tasks[i].due = document.getElementById(`t-due-${i}`).value; 
-            data.tasks[i].note = document.getElementById(`t-note-${i}`).value; 
-            save(); uiTasks(); 
-        }
-        function addTask() { const n=document.getElementById('nt').value; if(n){ data.tasks.push({n, st:'טרם החל', due:'', note:''}); save(); uiTasks(); } }
-        function remT(i) { if(confirm("למחוק?")){ data.tasks.splice(i,1); save(); uiTasks(); } }
 
         function uiCash() {
             let groups = {};
@@ -321,26 +302,65 @@
                         const dPay = new Date(s.arr); dPay.setDate(dPay.getDate() - 7);
                         const mKey = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
                         if(!groups[mKey]) groups[mKey] = { items: [], total: 0 };
-                        groups[mKey].items.push({ name: s.t || p.name, val: s.val * 0.7 });
+                        
+                        // התיקון כאן: מציג את תאריך הפירעון וגם את תאריך ההגעה המקורי
+                        const payDateStr = dPay.toLocaleDateString('he-IL');
+                        const arrivalDateStr = new Date(s.arr).toLocaleDateString('he-IL');
+                        
+                        groups[mKey].items.push({ 
+                            name: s.t || p.name, 
+                            pay: payDateStr, 
+                            arrival: arrivalDateStr,
+                            val: s.val * 0.7 
+                        });
                         groups[mKey].total += (s.val * 0.7);
                     }
                 });
             });
             let h = '<h2>💰 תזרים יבוא (70%)</h2>';
             for (let m in groups) {
-                h += `<div style="background:#fff; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #eee;"><div style="font-weight:bold; background:#f1f2f6; padding:5px;">${m}</div>`;
-                groups[m].items.forEach(it => { h += `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #f9f9f9;"><span>${it.name}</span><b>${it.val.toLocaleString()}$</b></div>`; });
-                h += `<div style="text-align:left; font-weight:bold; padding-top:5px;">סה"כ: ${groups[m].total.toLocaleString()}$</div></div>`;
+                h += `<div style="background:#fff; margin-bottom:15px; border-radius:10px; border:1px solid #eee;"><div style="background:#f1f2f6; padding:10px; font-weight:bold;">${m}</div>`;
+                groups[m].items.forEach(it => { 
+                    h += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                        <span>${it.name} (${it.pay}) <small style="opacity:0.6;">[הגעה: ${it.arrival}]</small></span>
+                        <b>${it.val.toLocaleString()}$</b>
+                    </div>`; 
+                });
+                h += `<div style="padding:10px; text-align:left; font-weight:900;">סה"כ: ${groups[m].total.toLocaleString()}$</div></div>`;
             }
-            openModal(h || 'אין נתונים כרגע');
+            openModal(h || 'אין נתוני תזרים');
         }
 
-        function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
-        function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', arr:'', ok:false, okNote:'', sea:false, val:0, cnt:'', note:'', siteUp:false, brokerSent:false}); save(); uiProd(id); }
-        function remMainProd(id) { if(confirm("למחוק תיק זה?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
+        function uiTasks() {
+            const tasks = data.tasks || [];
+            let h = `<h2>📝 לוח משימות</h2><div style="display:flex; gap:10px; margin-bottom:20px;"><input type="text" id="nt" placeholder="משימה חדשה..." style="flex:2;"><button onclick="addTask()" class="btn-save-action" style="margin:0; padding:0 30px;">הוסף</button></div><div class="ships-grid">`;
+            tasks.forEach((t, i) => {
+                let borderClass = t.st==='בטיפול'?'task-border-orange':(t.st==='בוצע'?'task-border-green':'task-border-red');
+                h += `<div class="task-cube ${borderClass}">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>${t.n}</span><span onclick="remT(${i})" style="cursor:pointer;">🗑️</span></div>
+                    <select id="t-st-${i}"><option value="טרם החל" ${t.st==='טרם החל'?'selected':''}>🔴 טרם החל</option><option value="בטיפול" ${t.st==='בטיפול'?'selected':''}>🟠 בטיפול</option><option value="בוצע" ${t.st==='בוצע'?'selected':''}>🟢 בוצע</option></select>
+                    <input type="date" id="t-due-${i}" value="${t.due||''}">
+                    <textarea id="t-note-${i}">${t.note||''}</textarea>
+                    <button class="btn-save-action" onclick="saveTask(${i})">💾 שמור</button>
+                </div>`;
+            });
+            openModal(h + '</div>');
+        }
+
+        function saveTask(i) { data.tasks[i].st = document.getElementById(`t-st-${i}`).value; data.tasks[i].due = document.getElementById(`t-due-${i}`).value; data.tasks[i].note = document.getElementById(`t-note-${i}`).value; save(); uiTasks(); }
+        function addTask() { const n=document.getElementById('nt').value; if(n){ if(!data.tasks) data.tasks=[]; data.tasks.push({n, st:'טרם החל', note:'', due:''}); save(); uiTasks(); } }
+        function remT(i) { if(confirm("למחוק?")){ data.tasks.splice(i,1); save(); uiTasks(); } }
+        function enableMainEdit(id) { const inp = document.getElementById(`main-name-${id}`); inp.disabled = false; inp.focus(); document.getElementById(`save-main-${id}`).style.display='inline'; }
+        function saveMainName(id) { data.prods.find(x => x.id === id).name = document.getElementById(`main-name-${id}`).value; save(); uiProd(id); }
+        function enableShipEdit(id, i) { document.getElementById(`t-${id}-${i}`).disabled = false; document.getElementById(`t-${id}-${i}`).focus(); }
+        function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ if(!data.prods) data.prods=[]; data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
+        function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:'', siteUp:false, brokerSent:false}); save(); uiProd(id); }
+        function remMainProd(id) { if(confirm("למחוק תיק זה לצמיתות?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
         function remShipInner(id, i) { if(confirm("למחוק עסקה זו?")){ data.prods.find(x => x.id === id).ships.splice(i,1); save(); uiProd(id); } }
-        function openModal(h) { document.getElementById('modal-content').innerHTML = h; document.getElementById('overlay').style.display='flex'; }
-        function closeModal() { document.getElementById('overlay').style.display='none'; }
+        function openModal(h) { document.getElementById('modal-content').innerHTML = h; document.getElementById('overlay').style.display='flex'; document.getElementById('back-btn').style.display='block'; }
+        function closeModal() { document.getElementById('overlay').style.display='none'; document.getElementById('back-btn').style.display='none'; }
+
+        renderSidebar(); renderCalendar();
     </script>
 </body>
 </html>
