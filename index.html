@@ -61,6 +61,20 @@
         .icon-btn:hover { opacity: 1; }
         #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
+        /* עיצוב חדש להודעת "נשמר בהצלחה" - מבודד לחלוטין */
+        .toast-msg {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #27ae60; color: white; padding: 12px 25px; border-radius: 50px;
+            font-weight: bold; z-index: 2000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none; animation: fadeInOut 3s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; bottom: 10px; }
+            15% { opacity: 1; bottom: 20px; }
+            85% { opacity: 1; bottom: 20px; }
+            100% { opacity: 0; bottom: 10px; }
+        }
+
         /* קוד מיוחד להתאמה לטלפון בלבד */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow-y: auto; }
@@ -91,6 +105,8 @@
     </div>
     <div id="overlay" class="overlay"><div class="modal"><span class="close-btn" onclick="closeModal()">&times;</span><div id="modal-content"></div></div></div>
     <div id="back-btn" onclick="closeModal()">חזרה ללוח הראשי</div>
+    
+    <div id="toast-container" class="toast-msg">✅ נשמר בהצלחה!</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
@@ -119,6 +135,16 @@
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
         const holidays = { "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-06":"חנוכה ב'","2026-12-07":"חנוכה ג'","2026-12-08":"חנוכה ד'","2026-12-09":"חנוכה ה'","2026-12-10":"חנוכה ו'","2026-12-11":"חנוכה ז'","2026-12-12":"חנוכה ח'" };
 
+        // פונקציה להצגת הודעת האישור
+        function showSaveToast() {
+            const toast = document.getElementById('toast-container');
+            toast.style.display = 'block';
+            // יצירת מנגנון שמעלים את ההודעה אחרי 3 שניות
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
         function save() {
             if (!data.prods) data.prods = [];
             if (!data.tasks) data.tasks = [];
@@ -126,6 +152,7 @@
             db.ref('calendar_final').set(data);
             renderSidebar();
             renderCalendar();
+            showSaveToast(); // הפעלת ההודעה בכל שמירה
         }
 
         db.ref('calendar_final').on('value', (s) => {
@@ -250,8 +277,6 @@
             s.cnt = document.getElementById(`cnt-${id}-${i}`).value;
             s.val = document.getElementById(`val-${id}-${i}`).value;
             s.note = document.getElementById(`note-${id}-${i}`).value;
-            
-            // שמירת השדות החדשים
             s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
             s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
             
