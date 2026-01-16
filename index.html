@@ -60,46 +60,16 @@
         .icon-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.7; transition: 0.2s; }
         .icon-btn:hover { opacity: 1; }
         #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-    /* קוד מיוחד להתאמה לטלפון בלבד */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column; 
-        overflow-y: auto;
-    }
-
-    #sidebar {
-        width: 100% !important;
-        height: auto !important;
-        position: relative;
-        padding: 10px;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 5px;
-        justify-content: center;
-    }
-
-    .sidebar-header, .bsh-text {
-        display: none; 
-    }
-
-    #sidebar button {
-        width: 45%; 
-        margin: 2px;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    #main-content {
-        width: 100%;
-        padding: 10px;
-        overflow: visible;
-    }
-
-    .calendar-grid {
-        grid-template-columns: 1fr; /* בטלפון נציג חודש אחד מתחת לשני לנוחות */
-    }
-}
+        
+        /* קוד מיוחד להתאמה לטלפון בלבד */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow-y: auto; }
+            #sidebar { width: 100% !important; height: auto !important; position: relative; padding: 10px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; justify-content: center; }
+            .sidebar-header, .bsh-text { display: none; }
+            #sidebar button { width: 45%; margin: 2px; padding: 10px; font-size: 14px; }
+            #main-content { width: 100%; padding: 10px; overflow: visible; }
+            .calendar-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -137,11 +107,9 @@
             appId: "1:791878309038:web:fb7dc79d4703abc8b5b93f"
         };
         
-        // אתחול בטוח
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // אתחול נתונים בסיסי - מונע שגיאות undefined
         let data = JSON.parse(localStorage.getItem('shmuel_v19_7_final')) || { prods: [], tasks: [] };
         if (!data.prods) data.prods = [];
         if (!data.tasks) data.tasks = [];
@@ -151,7 +119,6 @@
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
         const holidays = { "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-06":"חנוכה ב'","2026-12-07":"חנוכה ג'","2026-12-08":"חנוכה ד'","2026-12-09":"חנוכה ה'","2026-12-10":"חנוכה ו'","2026-12-11":"חנוכה ז'","2026-12-12":"חנוכה ח'" };
 
-        // --- Core Functions ---
         function save() {
             if (!data.prods) data.prods = [];
             if (!data.tasks) data.tasks = [];
@@ -178,11 +145,7 @@
             const prods = data.prods || [];
             listDiv.innerHTML = prods.map(p => {
                 const sCount = (p.ships && Array.isArray(p.ships)) ? p.ships.length : 0;
-                return `
-                <div class="product-item" onclick="uiProd(${p.id})">
-                    <span style="font-weight:bold;">${p.name}</span>
-                    <span class="ship-count">${sCount} עסקאות</span>
-                </div>`;
+                return `<div class="product-item" onclick="uiProd(${p.id})"><span style="font-weight:bold;">${p.name}</span><span class="ship-count">${sCount} עסקאות</span></div>`;
             }).join('');
         }
 
@@ -265,6 +228,10 @@
                     <label>מכולות:</label><input type="text" id="cnt-${id}-${i}" value="${s.cnt||''}">
                     <label>סכום ($):</label><input type="number" id="val-${id}-${i}" value="${s.val||0}">
                     <textarea id="note-${id}-${i}" placeholder="הערות לוגיסטיקה...">${s.note||''}</textarea>
+                    
+                    <label style="margin-top:5px; border-top: 1px solid #eee; padding-top:10px;"><input type="checkbox" id="siteUp-${id}-${i}" ${s.siteUp?'checked':''}> האם חומר עלה לאתר?</label>
+                    <label><input type="checkbox" id="brokerSent-${id}-${i}" ${s.brokerSent?'checked':''}> האם נשלח חומר לעמיל מכס?</label>
+                    
                     <button class="btn-save-action" onclick="saveShipInner(${id}, ${i})">💾 שמור</button>
                 </div>`;
             });
@@ -283,6 +250,11 @@
             s.cnt = document.getElementById(`cnt-${id}-${i}`).value;
             s.val = document.getElementById(`val-${id}-${i}`).value;
             s.note = document.getElementById(`note-${id}-${i}`).value;
+            
+            // שמירת השדות החדשים
+            s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
+            s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
+            
             save(); uiProd(id); 
         }
 
@@ -331,7 +303,7 @@
         function saveMainName(id) { data.prods.find(x => x.id === id).name = document.getElementById(`main-name-${id}`).value; save(); uiProd(id); }
         function enableShipEdit(id, i) { document.getElementById(`t-${id}-${i}`).disabled = false; }
         function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ if(!data.prods) data.prods=[]; data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
-        function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:''}); save(); uiProd(id); }
+        function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:'', siteUp:false, brokerSent:false}); save(); uiProd(id); }
         function remMainProd(id) { if(confirm("למחוק תיק זה לצמיתות?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
         function remShipInner(id, i) { if(confirm("למחוק עסקה זו?")){ data.prods.find(x => x.id === id).ships.splice(i,1); save(); uiProd(id); } }
         function openModal(h) { document.getElementById('modal-content').innerHTML = h; document.getElementById('overlay').style.display='flex'; document.getElementById('back-btn').style.display='block'; }
@@ -341,4 +313,3 @@
     </script>
 </body>
 </html>
-
