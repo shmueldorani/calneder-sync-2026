@@ -61,7 +61,7 @@
         .icon-btn:hover { opacity: 1; }
         #back-btn { position: fixed; bottom: 30px; left: 30px; background: var(--accent); color: white; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; z-index: 110; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        /* עיצוב חדש להודעת "נשמר בהצלחה" - מבודד לחלוטין */
+        /* עיצוב הודעת "נשמר בהצלחה" */
         .toast-msg {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: #27ae60; color: white; padding: 12px 25px; border-radius: 50px;
@@ -112,7 +112,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
 
     <script>
-        // --- Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyDkOd9JkH6TtNP1IrgnRFYoYuxoAvxOzYI",
             authDomain: "logistic-calender.firebaseapp.com",
@@ -135,14 +134,10 @@
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
         const holidays = { "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-06":"חנוכה ב'","2026-12-07":"חנוכה ג'","2026-12-08":"חנוכה ד'","2026-12-09":"חנוכה ה'","2026-12-10":"חנוכה ו'","2026-12-11":"חנוכה ז'","2026-12-12":"חנוכה ח'" };
 
-        // פונקציה להצגת הודעת האישור
         function showSaveToast() {
             const toast = document.getElementById('toast-container');
             toast.style.display = 'block';
-            // יצירת מנגנון שמעלים את ההודעה אחרי 3 שניות
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
         function save() {
@@ -152,7 +147,7 @@
             db.ref('calendar_final').set(data);
             renderSidebar();
             renderCalendar();
-            showSaveToast(); // הפעלת ההודעה בכל שמירה
+            showSaveToast();
         }
 
         db.ref('calendar_final').on('value', (s) => {
@@ -279,7 +274,6 @@
             s.note = document.getElementById(`note-${id}-${i}`).value;
             s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
             s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
-            
             save(); uiProd(id); 
         }
 
@@ -291,7 +285,9 @@
                         const dPay = new Date(s.arr); dPay.setDate(dPay.getDate() - 7);
                         const mKey = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
                         if(!groups[mKey]) groups[mKey] = { items: [], total: 0 };
-                        groups[mKey].items.push({ name: s.t || p.name, pay: dPay.toLocaleDateString('he-IL'), val: s.val * 0.7 });
+                        // כאן הוספתי את תאריך ההגעה בסוגריים
+                        const formattedArr = new Date(s.arr).toLocaleDateString('he-IL');
+                        groups[mKey].items.push({ name: s.t || p.name, pay: dPay.toLocaleDateString('he-IL'), arr: formattedArr, val: s.val * 0.7 });
                         groups[mKey].total += (s.val * 0.7);
                     }
                 });
@@ -299,7 +295,12 @@
             let h = '<h2>💰 תזרים יבוא (70%)</h2>';
             for (let m in groups) {
                 h += `<div style="background:#fff; margin-bottom:15px; border-radius:10px; border:1px solid #eee;"><div style="background:#f1f2f6; padding:10px; font-weight:bold;">${m}</div>`;
-                groups[m].items.forEach(it => { h += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><span>${it.name} (${it.pay})</span><b>${it.val.toLocaleString()}$</b></div>`; });
+                groups[m].items.forEach(it => { 
+                    h += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                        <span>${it.name} <small style="color:#7f8c8d;">(תשלום: ${it.pay} | הגעה: ${it.arr})</small></span>
+                        <b>${it.val.toLocaleString()}$</b>
+                    </div>`; 
+                });
                 h += `<div style="padding:10px; text-align:left; font-weight:900;">סה"כ: ${groups[m].total.toLocaleString()}$</div></div>`;
             }
             openModal(h || 'אין נתוני תזרים');
