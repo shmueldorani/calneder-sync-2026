@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול יבוא שמואל - גרסה סופית מאובטחת</title>
+    <title>ניהול יבוא שמואל - גרסה מעודכנת סופית</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #34495e; --accent: #e74c3c;
             --success: #27ae60; --bg: #f4f7f6; --white: #ffffff; --border: #dcdde1;
             --chinese-marker: #ff7675;
             --status-red: #e74c3c; --status-orange: #e67e22; --status-green: #27ae60;
-            --color-target: #f1c40f; 
-            --color-confirmed: #e67e22; 
-            --color-arrival: #27ae60; 
+            --color-target: #f1c40f;
+            --color-confirmed: #e67e22;
+            --color-arrival: #27ae60;
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: #2f3640; }
         #sidebar { width: 320px; background: var(--primary); color: white; display: flex; flex-direction: column; padding: 20px; box-shadow: 3px 0 15px rgba(0,0,0,0.2); z-index: 10; }
@@ -34,6 +34,8 @@
         .footer-btn { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
         .btn-tasks { background: #8e44ad; color: white; }
         .btn-cash { background: #f1c40f; color: #2c3e50; }
+        .btn-logistics { background: #3498db; color: white; }
+
         #main-content { flex: 1; overflow-y: auto; padding: 25px; }
         .main-title { text-align: center; color: var(--primary); font-size: 2rem; font-weight: 900; margin-bottom: 25px; border-bottom: 3px solid var(--success); display: block; width: fit-content; margin-left: auto; margin-right: auto; padding-bottom: 5px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
@@ -44,7 +46,7 @@
         .days-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.9rem; font-weight: 900; color: #000; background: #e8eaed; padding: 8px 0; border-radius: 5px; margin-bottom: 8px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .day-cell { height: 48px; border: 1px solid #f1f2f6; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.9rem; border-radius: 4px; position: relative; }
-        
+
         .day-cell.arrival-day { background: var(--color-arrival) !important; color: white !important; font-weight: 900; }
         .day-cell.confirmed-border { border: 3px solid var(--color-confirmed) !important; }
         .day-cell.target-border { border: 3px solid var(--color-target) !important; }
@@ -52,7 +54,7 @@
         .day-cell.chinese { background: var(--chinese-marker) !important; color: white !important; font-weight: bold; }
         .day-cell.holiday { background: #fff5f5; border: 1.5px solid #ffcccc; color: var(--accent); font-weight: 900; }
         .holiday-label { font-size: 0.5rem; position: absolute; bottom: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; font-weight: bold; }
-        
+
         .month-summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: auto; padding-top: 12px; border-top: 2px solid #f1f2f6; font-size: 0.75rem; }
         .summary-col { display: flex; flex-direction: column; gap: 4px; }
         .summary-col-title { font-weight: 900; margin-bottom: 5px; font-size: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 2px; display: flex; align-items: center; gap: 4px; }
@@ -62,11 +64,6 @@
         .dot-yellow { background: var(--color-target); }
         .summary-item { padding: 2px 0; border-bottom: 1px dashed #f0f0f0; line-height: 1.2; }
 
-        /* צבעי משימות - תיקון התקלה */
-        .task-border-red { border-right: 8px solid var(--status-red) !important; }
-        .task-border-orange { border-right: 8px solid var(--status-orange) !important; }
-        .task-border-green { border-right: 8px solid var(--status-green) !important; }
-
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal { background: white; width: 94%; max-width: 1150px; height: 85vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
         .close-btn { position: absolute; top: 15px; left: 15px; font-size: 2.5rem; cursor: pointer; color: #bdc3c7; line-height: 1; }
@@ -74,6 +71,9 @@
         .ship-cube, .task-cube { border-radius: 12px; padding: 18px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); }
         .ship-cube { border-top: 6px solid var(--success); transition: 0.3s; }
         .ship-not-ok { background: #ffeaea !important; border-top-color: var(--accent) !important; }
+        .task-border-red { border: 5px solid var(--status-red) !important; }
+        .task-border-orange { border: 5px solid var(--status-orange) !important; }
+        .task-border-green { border: 5px solid var(--status-green) !important; }
         input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
         .editable-title { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .editable-title input { font-weight: bold; border: none; background: #f9f9f9; padding: 5px; }
@@ -89,6 +89,25 @@
             display: none; animation: fadeInOut 3s forwards;
         }
         @keyframes fadeInOut { 0% { opacity: 0; bottom: 10px; } 15% { opacity: 1; bottom: 20px; } 85% { opacity: 1; bottom: 20px; } 100% { opacity: 0; bottom: 10px; } }
+
+        .log-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 0.9rem; }
+        .log-table th, .log-table td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        .log-table th { background: #f8f9fa; color: var(--primary); font-weight: 900; }
+
+        .btn-save-log {
+            background: #d4f8d4;
+            border: 1px solid #b6efb6;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #1e7e34;
+            transition: 0.2s;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .btn-save-log:hover { transform: scale(1.05); }
+
+        .log-month-header { background: #34495e; color: white; padding: 10px; font-weight: bold; text-align: right; margin-top: 20px; border-radius: 5px; display: flex; justify-content: space-between; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow-y: auto; }
@@ -111,6 +130,7 @@
         <input type="text" id="searchBox" placeholder="🔍 חפש תיק..." oninput="renderSidebar()">
         <div id="product-list" class="product-list"></div>
         <div class="sidebar-footer">
+            <button class="footer-btn btn-logistics" onclick="uiLogistics()">🚢 לוח לוגיסטי מרוכז</button>
             <button class="footer-btn btn-tasks" onclick="uiTasks()">📝 לוח משימות</button>
             <button class="footer-btn btn-cash" onclick="uiCash()">💰 תזרים יבוא</button>
         </div>
@@ -136,7 +156,7 @@
             messagingSenderId: "791878309038",
             appId: "1:791878309038:web:fb7dc79d4703abc8b5b93f"
         };
-        
+
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
@@ -145,16 +165,18 @@
         const mNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
         const hNames = ["טבת-שבט", "שבט-אדר", "אדר-ניסן", "ניסן-אייר", "אייר-סיון", "סיון-תמוז", "תמוז-אב", "אב-אלול", "אלול-תשרי", "תשרי-חשון", "חשון-כסלו", "כסלו-טבת"];
         const dNames = ["א","ב","ג","ד","ה","ו","ש"];
-        
-        const holidays = { 
+
+        const holidays = {
             "2026-03-03":"פורים","2026-04-01":"ערב פסח","2026-04-02":"פסח א'","2026-04-03":"חול המועד","2026-04-04":"חול המועד","2026-04-05":"חול המועד","2026-04-06":"חול המועד","2026-04-07":"חול המועד","2026-04-08":"פסח ב'","2026-04-22":"עצמאות","2026-05-23":"שבועות","2026-09-12":"ראש השנה א'","2026-09-13":"ראש השנה ב'","2026-09-21":"יום כיפור","2026-09-26":"סוכות","2026-09-27":"סוכות ב'","2026-09-28":"חול המועד","2026-09-29":"חול המועד","2026-09-30":"חול המועד","2026-10-01":"חול המועד","2026-10-02":"חול המועד","2026-10-03":"שמחת תורה","2026-12-05":"חנוכה א'","2026-12-12":"חנוכה ח'",
             "2027-03-23":"פורים","2027-04-21":"ערב פסח","2027-04-22":"פסח א'","2027-04-28":"פסח ב'","2027-05-12":"עצמאות","2027-06-11":"שבועות","2027-10-02":"ראש השנה א'","2027-10-11":"יום כיפור","2027-10-16":"סוכות א'","2027-10-23":"שמחת תורה"
         };
 
         function showSaveToast() {
             const toast = document.getElementById('toast-container');
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            if (toast) {
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
         }
 
         function save() {
@@ -166,12 +188,12 @@
 
         db.ref('calendar_final').on('value', (s) => {
             const cloudData = s.val();
-            if(cloudData) { 
-                data = cloudData; 
+            if(cloudData) {
+                data = cloudData;
                 if (!data.prods) data.prods = [];
                 if (!data.tasks) data.tasks = [];
-                renderSidebar(); 
-                renderCalendar(); 
+                renderSidebar();
+                renderCalendar();
             }
         });
 
@@ -208,10 +230,10 @@
         }
 
         function renderCalendar() {
-            const grid = document.getElementById('calendar-grid'); 
+            const grid = document.getElementById('calendar-grid');
             if(!grid) return;
             grid.innerHTML = '';
-            
+
             [2026, 2027].forEach(year => {
                 if(year === 2027) grid.innerHTML += `<div class="year-separator">שנת 2027 בשעה טובה</div>`;
                 for (let m = 0; m < 12; m++) {
@@ -222,31 +244,25 @@
 
                     (data.prods || []).forEach(p => {
                         (p.ships || []).forEach(s => {
-                            const shipLabel = s.t || p.name;
-                            const countLabel = s.cnt ? `(${s.cnt})` : '';
+                            if(s.due) {
+                                const dObj = new Date(s.due);
+                                if(dObj.getFullYear() === year && dObj.getMonth() === m) {
+                                    const day = dObj.getDate();
+                                    const shipName = s.t || p.name;
+                                    const shipCnt = s.cnt || '';
 
-                            if(s.sea && s.arr) {
-                                const dObj = new Date(s.arr);
-                                if(dObj.getFullYear() === year && dObj.getMonth() === m) {
-                                    const day = dObj.getDate();
-                                    colArrivals.push({ day, name: shipLabel, cnt: countLabel });
-                                    dayMeta[day] = { ...dayMeta[day], arrival: true };
-                                }
-                            } 
-                            else if(s.ok && s.due) {
-                                const dObj = new Date(s.due);
-                                if(dObj.getFullYear() === year && dObj.getMonth() === m) {
-                                    const day = dObj.getDate();
-                                    colConfirmed.push({ day, name: shipLabel, cnt: countLabel });
-                                    dayMeta[day] = { ...dayMeta[day], confirmed: true };
-                                }
-                            }
-                            else if(s.due) {
-                                const dObj = new Date(s.due);
-                                if(dObj.getFullYear() === year && dObj.getMonth() === m) {
-                                    const day = dObj.getDate();
-                                    colTargets.push({ day, name: shipLabel, cnt: countLabel });
-                                    dayMeta[day] = { ...dayMeta[day], target: true };
+                                    if(s.sea) {
+                                        colArrivals.push({ day, name: shipName, cnt: shipCnt });
+                                        dayMeta[day] = { ...dayMeta[day], arrival: true };
+                                    }
+                                    else if(s.ok) {
+                                        colConfirmed.push({ day, name: shipName, cnt: shipCnt });
+                                        dayMeta[day] = { ...dayMeta[day], confirmed: true };
+                                    }
+                                    else {
+                                        colTargets.push({ day, name: shipName, cnt: shipCnt });
+                                        dayMeta[day] = { ...dayMeta[day], target: true };
+                                    }
                                 }
                             }
                         });
@@ -263,15 +279,15 @@
                         <div class="month-summary-grid">
                             <div class="summary-col">
                                 <div class="summary-col-title"><span class="dot dot-green"></span> פרטי הגעה</div>
-                                ${colArrivals.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt}</div>`).join('')}
+                                ${colArrivals.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt ? `(${a.cnt})` : ''}</div>`).join('')}
                             </div>
                             <div class="summary-col">
                                 <div class="summary-col-title"><span class="dot dot-orange"></span> הזמנות שאושרו</div>
-                                ${colConfirmed.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt}</div>`).join('')}
+                                ${colConfirmed.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt ? `(${a.cnt})` : ''}</div>`).join('')}
                             </div>
                             <div class="summary-col">
                                 <div class="summary-col-title"><span class="dot dot-yellow"></span> יעדי עסקה</div>
-                                ${colTargets.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt}</div>`).join('')}
+                                ${colTargets.map(a => `<div class="summary-item"><b>${a.day}:</b> ${a.name} ${a.cnt ? `(${a.cnt})` : ''}</div>`).join('')}
                             </div>
                         </div>
                     </div>`;
@@ -280,14 +296,21 @@
         }
 
         function buildDays(y, m, dayMeta) {
-            let h = ''; const first = new Date(y, m, 1).getDay(); const total = new Date(y, m+1, 0).getDate();
+            let h = '';
+            const first = new Date(y, m, 1).getDay();
+            const total = new Date(y, m+1, 0).getDate();
             for(let i=0; i<first; i++) h += '<div></div>';
             for(let d=1; d<=total; d++) {
                 const isC = (y === 2026 && m === 1 && d >= 3 && d <= 17) || (y === 2027 && m === 1 && d >= 6 && d <= 20);
                 const k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
                 const meta = dayMeta[d] || {};
-                let statusClass = meta.arrival ? 'arrival-day' : '';
-                let borderClass = meta.confirmed ? 'confirmed-border' : (meta.target ? 'target-border' : '');
+                let statusClass = '';
+                if(meta.arrival) statusClass = 'arrival-day';
+
+                let borderClass = '';
+                if(meta.confirmed) borderClass = 'confirmed-border';
+                else if(meta.target) borderClass = 'target-border';
 
                 h += `<div class="day-cell ${isC?'chinese':''} ${holidays[k]?'holiday':''} ${statusClass} ${borderClass}">
                     ${d} ${isC ? '<span class="holiday-label">חג סיני</span>' : ''}
@@ -297,24 +320,212 @@
             return h;
         }
 
+        function uiProd(id) {
+            const p = data.prods.find(x => x.id === id);
+            if(!p) return;
+
+            if (p.ships && Array.isArray(p.ships)) {
+                p.ships.sort((a, b) => {
+                    if (!a.due) return 1;
+                    if (!b.due) return -1;
+                    return new Date(a.due) - new Date(b.due);
+                });
+            }
+
+            let h = `<div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ddd;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="editable-title">
+                        <input type="text" id="main-name-${id}" value="${p.name}" disabled>
+                        <span class="icon-btn" onclick="enableMainEdit(${id})">✏️</span>
+                        <button id="save-main-${id}" onclick="saveMainName(${id})" style="display:none; background:var(--success); color:white; border:none; padding:5px; border-radius:4px;">שמור</button>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="addShipInner(${id})" class="btn-save-action" style="margin:0; background:#3498db;">+ הוסף עסקה</button>
+                        <button onclick="remMainProd(${id})" class="btn-save-action" style="margin:0; background:var(--accent);">🗑️ מחק תיק</button>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <label style="font-weight:bold;">הערות לתיק:</label>
+                    <textarea id="main-notes-${id}" placeholder="הערות כלליות לתיק עסקה זה...">${p.notes || ''}</textarea>
+                    <button class="btn-save-action" style="padding:5px 15px; font-size:0.8rem;" onclick="saveMainNotes(${id})">שמור הערות תיק</button>
+                </div>
+            </div><div class="ships-grid">`;
+
+            (p.ships || []).forEach((s, i) => {
+                const redClass = s.ok ? '' : 'ship-not-ok';
+                h += `<div class="ship-cube ${redClass}">
+                    <div class="editable-title">
+                        <input type="text" id="t-${id}-${i}" value="${s.t||''}" placeholder="שם העסקה" disabled>
+                        <span class="icon-btn" onclick="enableShipEdit(${id},${i})">✏️</span>
+                        <span class="icon-btn" onclick="remShipInner(${id},${i})">🗑️</span>
+                    </div>
+                    <label style="font-weight:bold; color:var(--accent);">תאריך הגעה (יעד):</label><input type="date" id="due-${id}-${i}" value="${s.due||''}">
+                    <label>תאריך יציאה לים:</label><input type="date" id="arr-${id}-${i}" value="${s.arr||''}">
+                    <label><input type="checkbox" id="ok-${id}-${i}" ${s.ok?'checked':''}> אישור הזמנה</label>
+                    <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות אישור..." style="margin-top:5px;">
+                    <label><input type="checkbox" id="sea-${id}-${i}" ${s.sea?'checked':''}> יצא לים</label>
+                    <label>מכולות:</label><input type="text" id="cnt-${id}-${i}" value="${s.cnt||''}">
+                    <label>סכום ($):</label><input type="number" id="val-${id}-${i}" value="${s.val||0}">
+                    <textarea id="note-${id}-${i}" placeholder="הערות לוגיסטיקה...">${s.note||''}</textarea>
+                    <label style="margin-top:5px; border-top: 1px solid #eee; padding-top:10px;"><input type="checkbox" id="siteUp-${id}-${i}" ${s.siteUp?'checked':''}> האם חומר עלה לאתר?</label>
+                    <label><input type="checkbox" id="brokerSent-${id}-${i}" ${s.brokerSent?'checked':''}> האם נשלח חומר לעמיל מכס?</label>
+                    <button class="btn-save-action" onclick="saveShipInner(${id}, ${i})">💾 שמור</button>
+                </div>`;
+            });
+            openModal(h + '</div>');
+        }
+
+        // פונקציית לוח לוגיסטי חדשה ומקיפה (תוקן מיון חודשים)
+        function uiLogistics() {
+            let logData = [];
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            data.prods.forEach(p => {
+                (p.ships || []).forEach((s, shipIdx) => {
+                    if (s.arr) { // רק אם יש תאריך יציאה לים
+                        const dDue = s.due ? new Date(s.due) : null;
+                        if (!dDue || dDue >= today) { // רק אם תאריך הגעה טרם עבר
+                            logData.push({
+                                pId: p.id,
+                                sIdx: shipIdx,
+                                name: s.t || p.name,
+                                arr: s.arr,
+                                due: s.due,
+                                cnt: s.cnt || '0',
+                                tony: s.tony || 'לא',
+                                shipping: s.shipping || '',
+                                cost: s.cost || '',
+                                logNote: s.logNote || ''
+                            });
+                        }
+                    }
+                });
+            });
+
+            // מיון כרונולוגי עולה לפי תאריך יציאה
+            logData.sort((a, b) => new Date(a.arr) - new Date(b.arr));
+
+            // קיבוץ לפי חודשים (תיקון: מפתח חודש עם 2 ספרות כדי שה-sort יהיה כרונולוגי)
+            let monthsGroups = {};
+            logData.forEach(item => {
+                const d = new Date(item.arr);
+                const y = d.getFullYear();
+                const m = d.getMonth(); // 0-11
+                const key = `${y}-${String(m).padStart(2,'0')}`; // <-- תיקון קריטי
+
+                if (!monthsGroups[key]) monthsGroups[key] = { items: [], totalCnt: 0 };
+                monthsGroups[key].items.push(item);
+                monthsGroups[key].totalCnt += parseFloat(item.cnt || 0);
+            });
+
+            let h = `<h2>🚢 לוח לוגיסטי מרוכז</h2>`;
+
+            Object.keys(monthsGroups).sort().forEach(key => {
+                const [yStr, mStr] = key.split('-');
+                const y = parseInt(yStr, 10);
+                const m = parseInt(mStr, 10); // 0-11
+                const group = monthsGroups[key];
+
+                h += `
+                <div class="log-month-header">
+                    <span>${mNames[m]} ${y}</span>
+                    <span>סה"כ מכולות: ${group.totalCnt}</span>
+                </div>
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>תיק עסקה</th>
+                            <th>יציאה לים</th>
+                            <th>מכולות</th>
+                            <th>טוני</th>
+                            <th>חברת ספנות</th>
+                            <th>מחיר הובלה</th>
+                            <th>הערות לוגיסטיות</th>
+                            <th style="width:90px;">שמור</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                group.items.forEach(item => {
+                    h += `
+                    <tr>
+                        <td style="font-weight:bold;">${item.name}</td>
+                        <td>${item.arr.split('-').reverse().join('/')}</td>
+                        <td>${item.cnt}</td>
+                        <td>
+                            <select id="log-tony-${item.pId}-${item.sIdx}">
+                                <option value="כן" ${item.tony === 'כן' ? 'selected' : ''}>כן</option>
+                                <option value="לא" ${item.tony === 'לא' ? 'selected' : ''}>לא</option>
+                            </select>
+                        </td>
+                        <td><input type="text" id="log-ship-${item.pId}-${item.sIdx}" value="${item.shipping}"></td>
+                        <td><input type="text" id="log-cost-${item.pId}-${item.sIdx}" value="${item.cost}"></td>
+                        <td><textarea id="log-note-${item.pId}-${item.sIdx}" style="height:40px;">${item.logNote}</textarea></td>
+                        <td><button class="btn-save-log" onclick="saveLogItem(${item.pId}, ${item.sIdx})">שמור</button></td>
+                    </tr>`;
+                });
+                h += `</tbody></table>`;
+            });
+
+            openModal(h || '<p style="text-align:center;">אין עסקאות בדרך כרגע.</p>');
+        }
+
+        function saveLogItem(pId, sIdx) {
+            const p = data.prods.find(x => x.id === pId);
+            const s = p.ships[sIdx];
+            s.tony = document.getElementById(`log-tony-${pId}-${sIdx}`).value;
+            s.shipping = document.getElementById(`log-ship-${pId}-${sIdx}`).value;
+            s.cost = document.getElementById(`log-cost-${pId}-${sIdx}`).value;
+            s.logNote = document.getElementById(`log-note-${pId}-${sIdx}`).value;
+            save();
+            uiLogistics();
+        }
+
+        function saveMainNotes(id) {
+            const p = data.prods.find(x => x.id === id);
+            p.notes = document.getElementById(`main-notes-${id}`).value;
+            save();
+        }
+
+        function saveShipInner(id, i) {
+            const p = data.prods.find(x => x.id === id);
+            const s = p.ships[i];
+            s.t = document.getElementById(`t-${id}-${i}`).value;
+            s.due = document.getElementById(`due-${id}-${i}`).value;
+            s.arr = document.getElementById(`arr-${id}-${i}`).value;
+            s.ok = document.getElementById(`ok-${id}-${i}`).checked;
+            s.okNote = document.getElementById(`ok-note-${id}-${i}`).value;
+            s.sea = document.getElementById(`sea-${id}-${i}`).checked;
+            s.cnt = document.getElementById(`cnt-${id}-${i}`).value;
+            s.val = document.getElementById(`val-${id}-${i}`).value;
+            s.note = document.getElementById(`note-${id}-${i}`).value;
+            s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
+            s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
+            save(); uiProd(id);
+        }
+
         function uiCash() {
             let groups = {};
-            (data.prods || []).forEach(p => { 
+            (data.prods || []).forEach(p => {
                 (p.ships || []).forEach(s => {
-                    if((s.sea || s.ok) && (s.arr || s.due) && s.val > 0) {
-                        const baseDate = s.arr ? new Date(s.arr) : new Date(s.due);
-                        const dPay = new Date(baseDate); 
-                        dPay.setDate(dPay.getDate() - 7); 
-                        
-                        const sortKey = `${dPay.getFullYear()}-${String(dPay.getMonth()).padStart(2,'0')}`;
-                        const displayLabel = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
-                        
-                        if(!groups[sortKey]) groups[sortKey] = { label: displayLabel, items: [], total: 0 };
-                        
-                        groups[sortKey].items.push({ 
-                            name: s.t || p.name, 
-                            pay: dPay.toLocaleDateString('he-IL'), 
-                            arrival: baseDate.toLocaleDateString('he-IL'),
+                    if(s.due && s.val > 0) {
+                        const dArrival = new Date(s.due);
+                        const dPay = new Date(s.due);
+                        dPay.setDate(dPay.getDate() - 7);
+
+                        const sortKey = `${dPay.getFullYear()}-${String(dPay.getMonth() + 1).padStart(2, '0')}`;
+                        const monthDisplayName = `${mNames[dPay.getMonth()]} ${dPay.getFullYear()}`;
+
+                        if(!groups[sortKey]) {
+                            groups[sortKey] = { name: monthDisplayName, items: [], total: 0 };
+                        }
+
+                        groups[sortKey].items.push({
+                            name: s.t || p.name,
+                            pay: dPay.toLocaleDateString('he-IL'),
+                            arrival: dArrival.toLocaleDateString('he-IL'),
+                            arrivalRaw: s.due,
                             val: parseFloat(s.val)
                         });
                         groups[sortKey].total += parseFloat(s.val);
@@ -323,17 +534,22 @@
             });
 
             const sortedKeys = Object.keys(groups).sort();
-            let h = '<h2>💰 תזרים יבוא</h2>';
-            sortedKeys.forEach(k => {
-                const g = groups[k];
-                h += `<div style="background:#fff; margin-bottom:15px; border-radius:10px; border:1px solid #eee;"><div style="background:#f1f2f6; padding:10px; font-weight:bold;">${g.label}</div>`;
-                g.items.forEach(it => { 
+
+            let h = '<h2>💰 תזרים יבוא (100%)</h2>';
+            sortedKeys.forEach(key => {
+                const g = groups[key];
+
+                g.items.sort((a, b) => new Date(a.arrivalRaw) - new Date(b.arrivalRaw));
+
+                h += `<div style="background:#fff; margin-bottom:15px; border-radius:10px; border:1px solid #eee;">
+                    <div style="background:#f1f2f6; padding:10px; font-weight:bold;">${g.name}</div>`;
+                g.items.forEach(it => {
                     h += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                        <span>${it.name} (${it.pay}) <small style="opacity:0.6;">[הגעה: ${it.arrival}]</small></span>
+                        <span>${it.name} (${it.pay}) [הגעה: ${it.arrival}]</span>
                         <b>${it.val.toLocaleString()}$</b>
-                    </div>`; 
+                    </div>`;
                 });
-                h += `<div style="padding:10px; text-align:left; font-weight:900;">סה"כ: ${g.total.toLocaleString()}$</div></div>`;
+                h += `<div style="padding:10px; text-align:left; font-weight:900;">סה"כ חודשי: ${g.total.toLocaleString()}$</div></div>`;
             });
             openModal(h || 'אין נתוני תזרים');
         }
@@ -354,70 +570,13 @@
             openModal(h + '</div>');
         }
 
-        function uiProd(id) {
-            const p = data.prods.find(x => x.id === id);
-            if(!p) return;
-            let h = `<div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ddd;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="editable-title">
-                        <input type="text" id="main-name-${id}" value="${p.name}" disabled>
-                        <span class="icon-btn" onclick="enableMainEdit(${id})">✏️</span>
-                        <button id="save-main-${id}" onclick="saveMainName(${id})" style="display:none; background:var(--success); color:white; border:none; padding:5px; border-radius:4px;">שמור</button>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="addShipInner(${id})" class="btn-save-action" style="margin:0; background:#3498db;">+ הוסף עסקה</button>
-                        <button onclick="remMainProd(${id})" class="btn-save-action" style="margin:0; background:var(--accent);">🗑️ מחק תיק</button>
-                    </div>
-                </div>
-            </div><div class="ships-grid">`;
-            (p.ships || []).forEach((s, i) => {
-                const redClass = s.ok ? '' : 'ship-not-ok';
-                h += `<div class="ship-cube ${redClass}">
-                    <div class="editable-title">
-                        <input type="text" id="t-${id}-${i}" value="${s.t||''}" placeholder="שם העסקה" disabled>
-                        <span class="icon-btn" onclick="enableShipEdit(${id},${i})">✏️</span>
-                        <span class="icon-btn" onclick="remShipInner(${id},${i})">🗑️</span>
-                    </div>
-                    <label style="font-weight:bold; color:var(--accent);">תאריך יעד:</label><input type="date" id="due-${id}-${i}" value="${s.due||''}">
-                    <label>צפי הגעה:</label><input type="date" id="arr-${id}-${i}" value="${s.arr||''}">
-                    <label><input type="checkbox" id="ok-${id}-${i}" ${s.ok?'checked':''}> אישור הזמנה</label>
-                    <input type="text" id="ok-note-${id}-${i}" value="${s.okNote||''}" placeholder="הערות..." style="margin-top:5px;">
-                    <label><input type="checkbox" id="sea-${id}-${i}" ${s.sea?'checked':''}> יצא לים</label>
-                    <label>מכולות:</label><input type="text" id="cnt-${id}-${i}" value="${s.cnt||''}">
-                    <label>סכום ($):</label><input type="number" id="val-${id}-${i}" value="${s.val||0}">
-                    <textarea id="note-${id}-${i}" placeholder="הערות לוגיסטיקה...">${s.note||''}</textarea>
-                    <label style="margin-top:5px; border-top: 1px solid #eee; padding-top:10px;"><input type="checkbox" id="siteUp-${id}-${i}" ${s.siteUp?'checked':''}> האם חומר עלה לאתר?</label>
-                    <label><input type="checkbox" id="brokerSent-${id}-${i}" ${s.brokerSent?'checked':''}> האם נשלח חומר לעמיל מכס?</label>
-                    <button class="btn-save-action" onclick="saveShipInner(${id}, ${i})">💾 שמור</button>
-                </div>`;
-            });
-            openModal(h + '</div>');
-        }
-
-        function saveShipInner(id, i) { 
-            const p = data.prods.find(x => x.id === id);
-            const s = p.ships[i];
-            s.t = document.getElementById(`t-${id}-${i}`).value;
-            s.due = document.getElementById(`due-${id}-${i}`).value;
-            s.arr = document.getElementById(`arr-${id}-${i}`).value;
-            s.ok = document.getElementById(`ok-${id}-${i}`).checked;
-            s.okNote = document.getElementById(`ok-note-${id}-${i}`).value;
-            s.sea = document.getElementById(`sea-${id}-${i}`).checked;
-            s.cnt = document.getElementById(`cnt-${id}-${i}`).value;
-            s.val = document.getElementById(`val-${id}-${i}`).value;
-            s.note = document.getElementById(`note-${id}-${i}`).value;
-            s.siteUp = document.getElementById(`siteUp-${id}-${i}`).checked;
-            s.brokerSent = document.getElementById(`brokerSent-${id}-${i}`).checked;
-            save(); uiProd(id); 
-        }
-
         function saveTask(i) { data.tasks[i].st = document.getElementById(`t-st-${i}`).value; data.tasks[i].due = document.getElementById(`t-due-${i}`).value; data.tasks[i].note = document.getElementById(`t-note-${i}`).value; save(); uiTasks(); }
         function addTask() { const n=document.getElementById('nt').value; if(n){ if(!data.tasks) data.tasks=[]; data.tasks.push({n, st:'טרם החל', note:'', due:''}); save(); uiTasks(); } }
         function remT(i) { if(confirm("למחוק?")){ data.tasks.splice(i,1); save(); uiTasks(); } }
         function enableMainEdit(id) { const inp = document.getElementById(`main-name-${id}`); inp.disabled = false; inp.focus(); document.getElementById(`save-main-${id}`).style.display='inline'; }
         function saveMainName(id) { data.prods.find(x => x.id === id).name = document.getElementById(`main-name-${id}`).value; save(); uiProd(id); }
         function enableShipEdit(id, i) { document.getElementById(`t-${id}-${i}`).disabled = false; document.getElementById(`t-${id}-${i}`).focus(); }
-        function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ if(!data.prods) data.prods=[]; data.prods.push({id:Date.now(), name:n, ships:[]}); save(); } }
+        function addMainShip() { const n = prompt("שם תיק עסקה:"); if(n){ if(!data.prods) data.prods=[]; data.prods.push({id:Date.now(), name:n, ships:[], notes:''}); save(); } }
         function addShipInner(id) { const p = data.prods.find(x => x.id === id); if(!p.ships) p.ships = []; p.ships.push({t:'', due:'', ok:false, okNote:'', sea:false, arr:'', val:0, cnt:'', note:'', siteUp:false, brokerSent:false}); save(); uiProd(id); }
         function remMainProd(id) { if(confirm("למחוק תיק זה לצמיתות?")){ data.prods = data.prods.filter(x => x.id !== id); save(); closeModal(); } }
         function remShipInner(id, i) { if(confirm("למחוק עסקה זו?")){ data.prods.find(x => x.id === id).ships.splice(i,1); save(); uiProd(id); } }
